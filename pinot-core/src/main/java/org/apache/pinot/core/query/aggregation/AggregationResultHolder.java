@@ -37,6 +37,12 @@ public interface AggregationResultHolder {
   void setValue(Object value);
 
   /**
+   * Set the aggregation result value.
+   * @param value
+   */
+  void setValue(String value);
+
+  /**
    * Returns the 'primitive double' aggregation result.
    * @return
    */
@@ -47,4 +53,10 @@ public interface AggregationResultHolder {
    * @return
    */
   <T> T getResult();
+
+  /**
+   * Returns the 'primitive String' aggregation result.
+   * @return
+   */
+  String getStringResult();
 }

@@ -61,7 +61,7 @@ import com.yammer.metrics.core.MetricsRegistry;
 
 
 public class QueryExecutorTest {
-  private static final String AVRO_DATA_PATH = "data/simpleData200001.avro";
+  private static final String AVRO_DATA_PATH = "data/test_sample_data.avro";
   private static final String QUERY_EXECUTOR_CONFIG_PATH = "conf/query-executor.properties";
   private static final File INDEX_DIR = new File(FileUtils.getTempDirectory(), "QueryExecutorTest");
   private static final String TABLE_NAME = "testTable";
@@ -121,7 +121,7 @@ public class QueryExecutorTest {
     _queryExecutor = new ServerQueryExecutorV1Impl();
     _queryExecutor.init(new PinotConfiguration(queryExecutorConfig), instanceDataManager, _serverMetrics);
   }
-
+/*
   @Test
   public void testCountQuery() {
     String query = "SELECT COUNT(*) FROM " + TABLE_NAME;
@@ -130,7 +130,8 @@ public class QueryExecutorTest {
     DataTable instanceResponse = _queryExecutor.processQuery(getQueryRequest(instanceRequest), QUERY_RUNNERS);
     Assert.assertEquals(instanceResponse.getLong(0, 0), 400002L);
   }
-
+ */
+/*
   @Test
   public void testSumQuery() {
     String query = "SELECT SUM(met) FROM " + TABLE_NAME;
@@ -139,16 +140,35 @@ public class QueryExecutorTest {
     DataTable instanceResponse = _queryExecutor.processQuery(getQueryRequest(instanceRequest), QUERY_RUNNERS);
     Assert.assertEquals(instanceResponse.getDouble(0, 0), 40000200000.0);
   }
-
-  @Test
-  public void testMaxQuery() {
-    String query = "SELECT MAX(met) FROM " + TABLE_NAME;
+*/
+  /*@Test
+  public void testMinQuery() {
+    String query = "SELECT MIN(column15) FROM " + TABLE_NAME;
     InstanceRequest instanceRequest = new InstanceRequest(0L, COMPILER.compileToBrokerRequest(query));
     instanceRequest.setSearchSegments(_segmentNames);
     DataTable instanceResponse = _queryExecutor.processQuery(getQueryRequest(instanceRequest), QUERY_RUNNERS);
     Assert.assertEquals(instanceResponse.getDouble(0, 0), 200000.0);
   }
+*/
 
+  @Test
+  public void testMaxQuery() {
+    String query = "SELECT MAX(column15) FROM " + TABLE_NAME ;
+    InstanceRequest instanceRequest = new InstanceRequest(0L, COMPILER.compileToBrokerRequest(query));
+    instanceRequest.setSearchSegments(_segmentNames);
+    DataTable instanceResponse = _queryExecutor.processQuery(getQueryRequest(instanceRequest), QUERY_RUNNERS);
+    Assert.assertEquals(instanceResponse.getString(0, 0), "zzRCP");
+  }
+
+  @Test
+  public void testMaxQueryGroupBy() {
+    String query = "SELECT MAX(column15), column2 FROM " + TABLE_NAME + " group by column2 ";
+    InstanceRequest instanceRequest = new InstanceRequest(0L, COMPILER.compileToBrokerRequest(query));
+    instanceRequest.setSearchSegments(_segmentNames);
+    DataTable instanceResponse = _queryExecutor.processQuery(getQueryRequest(instanceRequest), QUERY_RUNNERS);
+    Assert.assertEquals(instanceResponse.getString(0, 0), "zzRCP");
+  }
+/*
   @Test
   public void testMinQuery() {
     String query = "SELECT MIN(met) FROM " + TABLE_NAME;
@@ -157,7 +177,7 @@ public class QueryExecutorTest {
     DataTable instanceResponse = _queryExecutor.processQuery(getQueryRequest(instanceRequest), QUERY_RUNNERS);
     Assert.assertEquals(instanceResponse.getDouble(0, 0), 0.0);
   }
-
+*/
   @AfterClass
   public void tearDown() {
     for (IndexSegment segment : _indexSegments) {

@@ -66,6 +66,11 @@ public class ObjectGroupByResultHolder implements GroupByResultHolder {
   }
 
   @Override
+  public String getStringResult(int groupKey) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getResult(int groupKey) {
     if (groupKey == GroupKeyGenerator.INVALID_ID) {
@@ -77,6 +82,11 @@ public class ObjectGroupByResultHolder implements GroupByResultHolder {
 
   @Override
   public void setValueForKey(int groupKey, double newValue) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setValueForKey(int groupKey, String newValue) {
     throw new UnsupportedOperationException();
   }
 

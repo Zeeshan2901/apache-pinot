@@ -33,6 +33,7 @@ import org.apache.pinot.core.query.aggregation.function.AggregationFunction;
 import org.apache.pinot.core.query.aggregation.function.customobject.MinMaxRangePair;
 import org.apache.pinot.core.query.request.context.ExpressionContext;
 import org.apache.pinot.core.segment.index.readers.Dictionary;
+import org.apache.pinot.spi.data.FieldSpec;
 import org.apache.pinot.spi.utils.ByteArray;
 
 
@@ -67,11 +68,16 @@ public class DictionaryBasedAggregationOperator extends BaseOperator<Intermediat
     List<Object> aggregationResults = new ArrayList<>(numAggregationFunctions);
     for (AggregationFunction aggregationFunction : _aggregationFunctions) {
       String column = ((ExpressionContext) aggregationFunction.getInputExpressions().get(0)).getIdentifier();
-      Dictionary dictionary = _dictionaryMap.get(column);
+      Dictionary
+              dictionary = _dictionaryMap.get(column);
       int dictionarySize = dictionary.length();
       switch (aggregationFunction.getType()) {
         case MAX:
-          aggregationResults.add(dictionary.getDoubleValue(dictionarySize - 1));
+          if (dictionary.getValueType() == FieldSpec.DataType.STRING) {
+            aggregationResults.add(dictionary.getStringValue(dictionarySize - 1));
+          } else {
+            aggregationResults.add(dictionary.getDoubleValue(dictionarySize - 1));
+          }
           break;
         case MIN:
           aggregationResults.add(dictionary.getDoubleValue(0));

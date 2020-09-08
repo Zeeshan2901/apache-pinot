@@ -374,6 +374,9 @@ public class IntermediateResultsBlock implements Block {
         case OBJECT:
           dataTableBuilder.setColumn(i, _aggregationResult.get(i));
           break;
+        case STRING:
+          dataTableBuilder.setColumn(i,(String) _aggregationResult.get(i));
+          break;
         default:
           throw new UnsupportedOperationException(
               "Unsupported aggregation column data type: " + columnDataTypes[i] + " for column: " + columnNames[i]);

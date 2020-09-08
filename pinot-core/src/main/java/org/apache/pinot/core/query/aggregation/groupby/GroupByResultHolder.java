@@ -39,6 +39,24 @@ public interface GroupByResultHolder {
   void setValueForKey(int groupKey, Object value);
 
   /**
+   * Store the given value (of type ResultType) for the given groupKey.
+   * @param groupKey
+   * @param value
+   */
+  void setValueForKey(int groupKey, String value);
+
+  /**
+   * Returns the result (double) for the given group by key.
+   * If the group key does not exist in the result holder, returns
+   * the defaultValue it was initialized with (default value of the aggregation
+   * function it is holding the result for).
+   *
+   * @param groupKey
+   * @return
+   */
+  String getStringResult(int groupKey);
+
+  /**
    * Returns the result (double) for the given group by key.
    * If the group key does not exist in the result holder, returns
    * the defaultValue it was initialized with (default value of the aggregation

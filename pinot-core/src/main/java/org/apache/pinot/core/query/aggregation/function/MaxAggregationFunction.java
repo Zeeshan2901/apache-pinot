@@ -24,13 +24,16 @@ import org.apache.pinot.common.utils.DataSchema.ColumnDataType;
 import org.apache.pinot.core.common.BlockValSet;
 import org.apache.pinot.core.query.aggregation.AggregationResultHolder;
 import org.apache.pinot.core.query.aggregation.DoubleAggregationResultHolder;
+import org.apache.pinot.core.query.aggregation.StringAggregationResultHolder;
 import org.apache.pinot.core.query.aggregation.groupby.DoubleGroupByResultHolder;
 import org.apache.pinot.core.query.aggregation.groupby.GroupByResultHolder;
+import org.apache.pinot.core.query.aggregation.groupby.StringGroupByResultHolder;
 import org.apache.pinot.core.query.request.context.ExpressionContext;
+import org.apache.pinot.spi.data.FieldSpec;
 
 
-public class MaxAggregationFunction extends BaseSingleInputAggregationFunction<Double, Double> {
-  private static final double DEFAULT_INITIAL_VALUE = Double.NEGATIVE_INFINITY;
+public class MaxAggregationFunction extends BaseSingleInputAggregationFunction<String, String> {
+  private static final String DEFAULT_INITIAL_VALUE = null;
 
   public MaxAggregationFunction(ExpressionContext expression) {
     super(expression);
@@ -43,12 +46,12 @@ public class MaxAggregationFunction extends BaseSingleInputAggregationFunction<D
 
   @Override
   public AggregationResultHolder createAggregationResultHolder() {
-    return new DoubleAggregationResultHolder(DEFAULT_INITIAL_VALUE);
+    return new StringAggregationResultHolder(DEFAULT_INITIAL_VALUE);
   }
 
   @Override
   public GroupByResultHolder createGroupByResultHolder(int initialCapacity, int maxCapacity) {
-    return new DoubleGroupByResultHolder(initialCapacity, maxCapacity, DEFAULT_INITIAL_VALUE);
+    return new StringGroupByResultHolder(initialCapacity, maxCapacity, DEFAULT_INITIAL_VALUE);
   }
 
   @Override
@@ -68,12 +71,31 @@ public class MaxAggregationFunction extends BaseSingleInputAggregationFunction<D
   @Override
   public void aggregateGroupBySV(int length, int[] groupKeyArray, GroupByResultHolder groupByResultHolder,
       Map<ExpressionContext, BlockValSet> blockValSetMap) {
-    double[] valueArray = blockValSetMap.get(_expression).getDoubleValuesSV();
-    for (int i = 0; i < length; i++) {
-      double value = valueArray[i];
-      int groupKey = groupKeyArray[i];
-      if (value > groupByResultHolder.getDoubleResult(groupKey)) {
-        groupByResultHolder.setValueForKey(groupKey, value);
+    FieldSpec.DataType dataType = blockValSetMap.get(_expression).getValueType();
+    if (dataType.isNumeric()) {
+      double[] valueArray = blockValSetMap.get(_expression).getDoubleValuesSV();
+      for (int i = 0; i < length; i++) {
+        double value = valueArray[i];
+        int groupKey = groupKeyArray[i];
+        if (value > groupByResultHolder.getDoubleResult(groupKey)) {
+          groupByResultHolder.setValueForKey(groupKey, value);
+        }
+      }
+    } else {
+      String[] valueArray = blockValSetMap.get(_expression).getStringValuesSV();
+      for (int i = 0; i < length; i++) {
+        String value = valueArray[i];
+        int groupKey = groupKeyArray[i];
+        String compare = groupByResultHolder.getStringResult(groupKey);
+        if(compare == null){
+          compare="";
+        }
+        if(value==null){
+          value="";
+        }
+        if (value.compareTo(compare) > 0) {
+          groupByResultHolder.setValueForKey(groupKey, value);
+        }
       }
     }
   }
@@ -93,18 +115,18 @@ public class MaxAggregationFunction extends BaseSingleInputAggregationFunction<D
   }
 
   @Override
-  public Double extractAggregationResult(AggregationResultHolder aggregationResultHolder) {
-    return aggregationResultHolder.getDoubleResult();
+  public String extractAggregationResult(AggregationResultHolder aggregationResultHolder) {
+    return aggregationResultHolder.getStringResult();
   }
 
   @Override
-  public Double extractGroupByResult(GroupByResultHolder groupByResultHolder, int groupKey) {
-    return groupByResultHolder.getDoubleResult(groupKey);
+  public String extractGroupByResult(GroupByResultHolder groupByResultHolder, int groupKey) {
+    return groupByResultHolder.getStringResult(groupKey);
   }
 
   @Override
-  public Double merge(Double intermediateResult1, Double intermediateResult2) {
-    if (intermediateResult1 > intermediateResult2) {
+  public String merge(String intermediateResult1, String intermediateResult2) {
+    if (intermediateResult1.compareTo(intermediateResult2) > 0 ) {
       return intermediateResult1;
     } else {
       return intermediateResult2;
@@ -118,16 +140,16 @@ public class MaxAggregationFunction extends BaseSingleInputAggregationFunction<D
 
   @Override
   public ColumnDataType getIntermediateResultColumnType() {
-    return ColumnDataType.DOUBLE;
+    return ColumnDataType.STRING;
   }
 
   @Override
   public ColumnDataType getFinalResultColumnType() {
-    return ColumnDataType.DOUBLE;
+    return ColumnDataType.STRING;
   }
 
   @Override
-  public Double extractFinalResult(Double intermediateResult) {
+  public String extractFinalResult(String intermediateResult) {
     return intermediateResult;
   }
 }

@@ -86,6 +86,11 @@ public class DoubleGroupByResultHolder implements GroupByResultHolder {
   }
 
   @Override
+  public String getStringResult(int groupKey) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public void setValueForKey(int groupKey, double newValue) {
     if (groupKey != GroupKeyGenerator.INVALID_ID) {
       _resultArray[groupKey] = newValue;
@@ -94,6 +99,10 @@ public class DoubleGroupByResultHolder implements GroupByResultHolder {
 
   @Override
   public void setValueForKey(int groupKey, Object newValue) {
+    throw new UnsupportedOperationException();
+  }
+  @Override
+  public void setValueForKey(int groupKey, String newValue) {
     throw new UnsupportedOperationException();
   }
 }

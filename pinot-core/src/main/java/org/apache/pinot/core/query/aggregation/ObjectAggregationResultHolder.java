@@ -44,6 +44,27 @@ public class ObjectAggregationResultHolder implements AggregationResultHolder {
 
   /**
    * {@inheritDoc}
+   * Value for this class is 'primitive double', so this method is not implemented.
+   * @param value
+   */
+  @Override
+  public void setValue(String value) {
+    throw new RuntimeException("Method 'setValue' (with String value) not supported for class " + getClass().getName());
+  }
+
+  /**
+   * {@inheritDoc}
+   * @return
+   */
+  @Override
+  public String getStringResult() {
+    throw new RuntimeException("Method 'getDoubleResult' not supported for class " + getClass().getName());
+  }
+
+
+
+  /**
+   * {@inheritDoc}
    * @return
    */
   @Override
